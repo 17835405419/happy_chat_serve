@@ -20,4 +20,8 @@ module.exports = {
     AUTHUSER: "2456491540@qq.com", //邮箱号
     AUTHPASS: "bjftzjuoiepjdiai", //stmp授权码
   },
+  CORS: {
+    ORIGIN: "*", // 设置允许的 origin，可以是单个字符串或者字符串数组
+    METHODS: "GET,HEAD,PUT,PATCH,POST,DELETE", // 允许的 HTTP 方法
+  },
 };

@@ -2,7 +2,7 @@
  * 插件的开启及配置
  *
  */
-const { HOSTNAME, MYSQL, redis, JWT, EMAIL } = require("./config");
+const { HOSTNAME, MYSQL, redis, JWT, EMAIL, CORS } = require("./config");
 const bodyParser = require("koa-bodyparser");
 const parameter = require("koa-parameter");
 const Redis = require("ioredis");
@@ -12,7 +12,8 @@ const jsonwebtoken = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const { Sequelize, Model, DataTypes } = require("sequelize");
 const bcrypt = require("bcrypt");
-const SocketManager = require("../app/socket/socketManager"); //导入socket.io
+
+const cors = require("koa2-cors");
 
 // ! 因为使用了sequelize-cli 暂时不需要这样手动连接了
 // const dbConnect = async () => {
@@ -56,22 +57,19 @@ const koaSequelize = () => {
     {
       host: HOSTNAME,
       dialect: "mysql",
+      logging: false, // 禁止输出查询日志
     }
   );
   return { sequelize, Model, DataTypes };
 };
 // redies的使用
-const koaRedis = (app) => {
+const koaRedis = () => {
   const redisClient = new Redis({
     host: "localhost", // Redis 服务器的主机名
     port: redis.REDISPORT, // Redis 服务器的端口号
     db: 0,
   });
-  app.use(async (ctx, next) => {
-    // 将 redis 客户端实例添加到 Koa 的 context 上下文中，使得在路由或其他中间件中可以方便地使用 Redis
-    ctx.redis = redisClient;
-    await next();
-  });
+  return redisClient;
 };
 
 // uuid 的使用
@@ -106,19 +104,20 @@ const koaTransporter = () => {
   return transporter;
 };
 
-// socket 通讯插件
-const koaSocket = (server, app) => {
-  // 初始化 socket
-  const socketManager = new SocketManager(server);
-  app.use(async (ctx, next) => {
-    // 将 socketManager 实例挂载到 ctx 上下文中
-    ctx.socket = socketManager;
-    await next();
-  });
+// 跨域处理
+const koaCors = (app) => {
+  app.use(
+    cors({
+      origin: CORS.ORIGIN,
+      methods: CORS.METHODS,
+    })
+  );
 };
 
+const ceshi = () => 123;
 module.exports = {
   //! dbConnect,
+  ceshi,
   koaBodyParser,
   koaParameter,
   koaSequelize,
@@ -128,5 +127,5 @@ module.exports = {
   koaJwt,
   koaJsonwebtoken,
   koaTransporter,
-  koaSocket,
+  koaCors,
 };

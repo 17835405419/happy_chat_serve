@@ -22,7 +22,7 @@ class UserController {
       if (res) helper.success(ctx, 1000, "用户注册成功");
     } catch (error) {
       const errorMessage = `${error.errors[0].field} ${error.errors[0].message}`;
-      helper.throw(ctx, 400, 10001, errorMessage);
+      helper.throw(ctx, 200, 10001, errorMessage);
     }
   }
 
@@ -35,29 +35,33 @@ class UserController {
   async login(ctx) {
     const { helper, utils } = ctx.utils;
     const { findOneUser } = ctx.service.user_service;
+
     try {
       ctx.verifyParams(login_verify);
       const loginInfo = ctx.request.body;
       const { isOk, project } = await findOneUser(ctx, loginInfo);
 
       if (isOk) {
-        // 调用工具类为密码加密
-        const newPassword = await utils.hashPassword(loginInfo.password);
         //通过bcrypt.compare 比较加密的密码和数据库中的密码是否相同
-        if (utils.hashCompare(project.password, newPassword)) {
+        const isTrue = await utils.hashCompare(
+          loginInfo.password,
+          project.password
+        );
+
+        if (isTrue) {
           const token = utils.generateToken({
             id: project.id,
             username: project.username,
           });
           return helper.success(ctx, 1000, "登录成功", { token: token });
         }
-        helper.throw(ctx, 400, 10007, "用户密码错误");
+        helper.throw(ctx, 200, 10007, "用户密码错误");
       }
     } catch (error) {
       // 处理参数验证错误
 
       const errorMessage = `${error.errors[0].field} ${error.errors[0].message}`;
-      helper.throw(ctx, 400, 10001, errorMessage);
+      helper.throw(ctx, 200, 10001, errorMessage);
     }
   }
 
@@ -82,13 +86,13 @@ class UserController {
       helper.success(ctx, 1000, "验证码发送成功");
     } catch (error) {
       const errorMessage = `${error.errors[0].field} ${error.errors[0].message}`;
-      helper.throw(ctx, 400, 10001, errorMessage);
+      helper.throw(ctx, 200, 10001, errorMessage);
     }
   }
 
   /**
    *
-   * @description 获取用户信息
+   * @description 获取登录用户信息
    * @param {*} ctx
    * @memberof UserController
    */
@@ -100,6 +104,24 @@ class UserController {
       const { id } = ctx.state.user;
       // 通过id查找用户
       const { isOk, project } = await findOneUser(ctx, { id }, ["password"]);
+      if (isOk) {
+        helper.success(ctx, 1000, "获取用户信息成功", {
+          result: project.dataValues,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getOneUserInfo(ctx) {
+    const { helper } = ctx.utils;
+    const { findOneUser } = ctx.service.user_service;
+
+    try {
+      const condition = ctx.request.query;
+      console.log(condition);
+      const { isOk, project } = await findOneUser(ctx, condition, ["password"]);
       if (isOk) {
         helper.success(ctx, 1000, "获取用户信息成功", {
           result: project.dataValues,

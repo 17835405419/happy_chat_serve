@@ -50,14 +50,14 @@ class UserService {
       });
 
       if (project === null) {
-        helper.throw(ctx, 400, 10005, "用户不存在");
+        helper.throw(ctx, 200, 10005, "用户不存在");
         return { isOk: false, project };
       } else {
         return { isOk: true, project };
       }
     } catch (error) {
       console.log(error);
-      helper.throw(400, 1006, "用户查找失败");
+      helper.throw(400, 10001, error.message);
     }
   }
 
@@ -75,7 +75,7 @@ class UserService {
       // 使用 ctx.redis.expire 设置键的过期时间
       await ctx.redis.expire(userEmail, 300);
     } catch (error) {
-      helper.throw(ctx, 400, 10002, "验证码发送错误");
+      helper.throw(ctx, 400, 10001, error.message);
     }
   }
 }

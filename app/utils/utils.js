@@ -34,6 +34,18 @@ class Utils {
     return token;
   }
 
+  verifyToken(token) {
+    const jwt = koaJsonwebtoken();
+    return new Promise((resolve, reject) => {
+      jwt.verify(token, JWT.SECRET, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
+  }
   /**
    *
    *
@@ -71,6 +83,46 @@ class Utils {
   async hashCompare(params1, params2) {
     const bcrypt = koaBcrypt();
     return await bcrypt.compare(params1, params2);
+  }
+
+  /**
+   *
+   *
+   * @param {*} model 数据库模型
+   * @param {*} query 查询条件
+   * @param {*} [exclude=[]]
+   * @param {number} [page=1]
+   * @param {number} [pageSize=10]
+   * @return {*}
+   * @memberof Utils
+   */
+  async paginate(
+    model,
+    query,
+    exclude = [],
+    include = [],
+    page = 1,
+    pageSize = 10
+  ) {
+    // 计算偏移量
+    const offset = (page - 1) * pageSize;
+    const data = await model.findAll({
+      where: query,
+      attributes: {
+        exclude: exclude,
+      },
+      include: include, //连表选项
+      offset: offset,
+      limit: pageSize,
+    });
+    // 处理数据
+    const res = data.map((element) => {
+      return element.dataValues;
+    });
+
+    const totalCount = await model.count({ where: query });
+
+    return { project: res, totalCount: totalCount };
   }
 }
 

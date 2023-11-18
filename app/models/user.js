@@ -1,7 +1,8 @@
 "use strict";
 const { koaSequelize } = require("../../config/pluglit");
-const Friendship = require("../models/friendShip");
+const FriendShip = require("../models/friendShip.js");
 const { sequelize, Model, DataTypes } = koaSequelize();
+
 const { hashPassword } = require("../utils/utils.js");
 const User = sequelize.define(
   "User",
@@ -27,7 +28,8 @@ const User = sequelize.define(
       allowNull: false,
     },
     email: {
-      unique: true,
+      // TODO 为了测试数据 现改为不唯一之后再改
+      // unique: true,
       type: DataTypes.STRING,
       validate: {
         isEmail: true,
@@ -60,14 +62,6 @@ const User = sequelize.define(
     tableName: "user",
   }
 );
-
-// 好友关系关联
-User.belongsToMany(User, {
-  through: Friendship,
-  as: "Friends",
-  foreignKey: "UserID1",
-  otherKey: "UserID2",
-});
 
 (async () => {
   await sequelize.sync();

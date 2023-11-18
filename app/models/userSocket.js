@@ -13,18 +13,18 @@ const UserSocket = sequelize.define(
   "UserSocket",
   {
     userId: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      unique: true,
     },
     socketId: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING,
     },
   },
   {
     tableName: "userSocket",
   }
 );
+
 // 将user表 与该表进行关联
 UserSocket.belongsTo(User, { foreignKey: "userId" });
 
