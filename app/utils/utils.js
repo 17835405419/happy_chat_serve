@@ -101,6 +101,7 @@ class Utils {
     query,
     exclude = [],
     include = [],
+    order = [],
     page = 1,
     pageSize = 10
   ) {
@@ -114,7 +115,9 @@ class Utils {
       include: include, //连表选项
       offset: offset,
       limit: pageSize,
+      order: order, // 排序选项
     });
+
     // 处理数据
     const res = data.map((element) => {
       return element.dataValues;

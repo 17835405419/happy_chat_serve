@@ -47,12 +47,7 @@ class FriendShipService {
         Object.assign(query, {
           status: condition.status,
         });
-      // if (condition.userId1) {
-      //   as = "beRequest_friendShipInfo"; //发送申请者
-      // } else {
-      //   as = "request_friendShipInfo";
-      // }
-      // 编写连表选项 与 user链接
+
       const include = [
         {
           model: User,
@@ -72,6 +67,7 @@ class FriendShipService {
         query,
         exclude,
         include,
+        [],
         condition.page
       );
 
@@ -126,7 +122,7 @@ class FriendShipService {
       }
     } catch (error) {
       console.log(error.message);
-      helper.throw(400, 20001, error.message);
+      helper.throw(ctx, 400, 20001, error.message);
     }
   }
 

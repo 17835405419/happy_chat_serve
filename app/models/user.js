@@ -1,8 +1,6 @@
 "use strict";
 const { koaSequelize } = require("../../config/pluglit");
-const FriendShip = require("../models/friendShip.js");
 const { sequelize, Model, DataTypes } = koaSequelize();
-
 const { hashPassword } = require("../utils/utils.js");
 const User = sequelize.define(
   "User",
@@ -44,7 +42,7 @@ const User = sequelize.define(
     },
     desc: DataTypes.STRING(30),
     avatarUrl: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       validate: {
         isUrl: true,
       },
